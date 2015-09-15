@@ -1,0 +1,41 @@
+default: omise.api
+
+store:
+
+  robins_card:
+    card:
+      name: Robin Clart
+      number: 4242424242424242
+      expiration_year: 2017
+      expiration_month: 12
+      security_code: 123
+
+omise:
+
+  vault:
+    url: https://vault.omise.co/
+    user: pkey_test_50760e0tqcxiobuw1x5
+    send: json
+    receive: json
+
+  api:
+    url: https://api.omise.co/
+    user: skey_test_4yfmcd5j35t57hv1gmt
+    send: json
+    receive: json
+
+  create_charge_with_token:
+    - 'use omise.vault'
+    - 'post tokens %{robins_card}'
+    - 'store token_id id'
+    - 'use omise.api'
+    - 'post charge amount=100000 currency=thb card=%{token_id}'
+
+  create_charge_with_customer:
+    - 'use omise.vault'
+    - 'post tokens %{robins_card}'
+    - 'store token_id id'
+    - 'use omise.api'
+    - 'post customer email=robin@clart.be card=%{token_id}'
+    - 'store customer_id id'
+    - 'post charge amount=100000 currency=thb customer=%{customer_id}'

@@ -1,0 +1,113 @@
+#!/usr/bin/env ruby
+
+# require "hc"
+require "rest-client"
+require "uri"
+require "shellwords"
+require "json"
+require "yaml"
+require "ansi"
+
+def lookup_profile(config, path)
+  segments = path.split(".", 2)
+  if segments.length == 1
+    config[segments.first]
+  else
+    lookup_profile(config[segments.first], segments.last)
+  end
+end
+
+config_path = ".hcrc"
+if File.exists?(config_path)
+  config = YAML.load(File.read(config_path)).to_h
+else
+  config = {}
+end
+
+if ARGV.first
+  profile_name = ARGV.shift
+else
+  profile_name = config["default"]
+  puts "[using default profile #{profile_name}]"
+end
+
+profile = lookup_profile(config, profile_name)
+
+url = URI.parse(profile["url"])
+user = profile["user"]
+command = ""
+response = ""
+local_store = {}
+
+begin
+  loop do
+    print "#{profile_name}> "
+    args = (gets.strip % local_store).shellsplit
+    command = args.shift
+
+    case command
+    when "use"
+      profile_name = args.first
+      profile = lookup_profile(config, profile_name)
+      url = URI.parse(profile["url"])
+      user = profile["user"]
+      command = ""
+    when "get"
+      resource = RestClient::Resource.new(url, user: user)
+      path = args.shift
+      data = args.any? ? Hash[args.map { |a| a.split(?=, 2) }] : {}
+      resource[path].get(data) do |res|
+        response = JSON.parse(res)
+        body = JSON.pretty_generate(response) << "\n"
+        puts body
+      end
+    when "post"
+      resource = RestClient::Resource.new(url, user: user)
+      path = args.shift
+      data = args.any? ? Hash[args.map { |a| a.split(?=, 2) }] : {}
+      resource[path].post(data) do |res|
+        response = JSON.parse(res)
+        body = JSON.pretty_generate(response) << "\n"
+        puts body
+      end
+    when "patch"
+      resource = RestClient::Resource.new(url, user: user)
+      path = args.shift
+      data = args.any? ? Hash[args.map { |a| a.split(?=, 2) }] : {}
+      resource[path].patch do |res|
+        response = JSON.parse(res)
+        body = JSON.pretty_generate(response) << "\n"
+        puts body
+      end
+    when "put"
+      resource = RestClient::Resource.new(url, user: user)
+      path = args.shift
+      data = args.any? ? Hash[args.map { |a| a.split(?=, 2) }] : {}
+      resource[path].put(data) do |res|
+        response = JSON.parse(res)
+        body = JSON.pretty_generate(response) << "\n"
+        puts body
+      end
+    when "delete"
+      resource = RestClient::Resource.new(url, user: user)
+      path = args.shift
+      data = args.any? ? Hash[args.map { |a| a.split(?=, 2) }] : {}
+      resource[path].delete(data) do |res|
+        response = JSON.parse(res)
+        body = JSON.pretty_generate(response) << "\n"
+        puts body
+      end
+    when "store"
+      local_store[args[0].to_sym] = response[args[1]]
+      puts local_store[args[0].to_sym].inspect
+    when "exit"
+      raise Interrupt
+    else
+    end
+  end
+rescue Interrupt
+  puts if command != "exit"
+end
+
+puts "[bye]"
+exit 0
