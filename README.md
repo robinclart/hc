@@ -1,41 +1,77 @@
 # Hc
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/hc`. To experiment with that code, run `bin/console` for an interactive prompt.
+Hc fuses together a REPL an http client and a profile to let you navigate APIs more simply.
 
-TODO: Delete this and the text above, and describe your gem
+Starts `hc` by providing a configuration file.
 
-## Installation
+Here's a simple configuration file:
 
-Add this line to your application's Gemfile:
+    name: "omise"
 
-```ruby
-gem 'hc'
-```
+    default_env: "api"
 
-And then execute:
+    environments:
 
-    $ bundle
+      api:
+        url: https://api.omise.co/
+        user: skey_test_xxxxxxxxxxxxxxxxxxx
 
-Or install it yourself as:
+      vault:
+        url: https://vault.omise.co/
+        user: pkey_test_xxxxxxxxxxxxxxxxxxx
+  
+    store:
 
-    $ gem install hc
+      :card: >-
+        card[name]=Robin Clart
+        card[number]=4242424242424242
+        card[expiration_year]=2017
+        card[expiration_month]=12
+        card[security_code]=123
 
-## Usage
+    plays:
 
-TODO: Write usage instructions here
+      post_token:
+        - 'use vault'
+        - 'post /tokens %{card}'
+        - 'store token_id id'
 
-## Development
+      post_charge:
+        - 'play create_token'
+        - 'use api'
+        - 'post /charges amount=100000 currency=thb card=%{token_id}'
+        - 'store charge_id id'
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment. Run `bundle exec hc` to use the gem in this directory, ignoring other installed copies of this gem.
+# Options
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+`name` defines the name shown in the prompt.
 
-## Contributing
+`default_env` select the default environment with which hc starts.
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/hc.
+`environments` list the different urls, as well as the username and password
+that will be used in the Authorization header when making requests.
 
+`store` provide a way to store data that will be interpolated with the command
+you pass.
 
-## License
+`plays` are list of commands that you can run sequentially. You can even nest plays into other plays.
 
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+# Commands
 
+`use ENV_NAME` will switch from one env to another one.
+
+`get PATH` make a GET request.
+
+`post PATH [PARAMS...]` make a POST request with the provided params.
+
+`patch PATH [PARAMS...]` make a PATCH request with the provided params.
+
+`delete PATH` make a DELETE request.
+
+`plays` list all plays.
+
+`play [PLAY_NAME]` run a play.
+
+`store NAME ATTRIBUTE` store into NAME the value from the ATTRIBUTE found in the latest response.
+
+`fetch NAME` fetch value from NAME.
