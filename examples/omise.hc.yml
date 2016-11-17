@@ -1,0 +1,45 @@
+name: "omise"
+
+default_env: "api"
+
+environments:
+
+  api:
+    url: https://api.omise.co/
+    user: skey_test_52fmuzoodjcgykm6oip
+
+  vault:
+    url: https://vault.omise.co/
+    user: pkey_test_52fmuzfojds3226akac
+
+store:
+
+  :robins_card: >-
+    card[name]=Robin Clart
+    card[number]=4242424242424242
+    card[expiration_year]=2017
+    card[expiration_month]=12
+    card[security_code]=123
+
+  :robins_customer: >-
+    email=robin@clart.be
+
+plays:
+
+  create_token:
+    - 'use vault'
+    - 'post /tokens %{robins_card}'
+    - 'store token_id id'
+
+  create_charge_with_token:
+    - 'play create_token'
+    - 'use api'
+    - 'post /charges amount=100000 currency=thb card=%{token_id}'
+    - 'store charge_id id'
+
+  create_charge_with_customer:
+    - 'play create_token'
+    - 'use api'
+    - 'post /customer %{robins_customer} card=%{token_id}'
+    - 'store customer_id id'
+    - 'post /charge amount=100000 currency=thb customer=%{customer_id}'
