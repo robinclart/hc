@@ -17,7 +17,29 @@ module Hc
     end
 
     def self.open(path)
-      new YAML.load(File.read(path)).to_h
+      config = nil
+
+      if !path
+        puts "No path given"
+        puts "Usage: hc example.yml"
+        exit 1
+      end
+
+      if File.exists?(path)
+        config = YAML.load(File.read(path)).to_h
+      end
+
+      if !config && File.exists?(File.expand_path("~/.hc/#{path}.yml"))
+        config = YAML.load(File.read(File.expand_path("~/.hc/#{path}.yml"))).to_h
+      end
+
+      if !config
+        puts "No file found at those location"
+        puts "Usage: hc example.yml"
+        exit 1
+      end
+
+      new(config)
     end
 
     attr_reader :name

@@ -2,12 +2,6 @@
 
 require "hc"
 
-if !ARGV.first || !File.exists?(ARGV.first)
-  puts "No hc profile configuration file given"
-  puts "Usage: hc example.yml"
-  exit 1
-end
-
 profile = Hc::Profile.open(ARGV.first)
 
 begin
