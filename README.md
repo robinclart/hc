@@ -4,7 +4,9 @@ Hc fuses together a REPL an http client and a profile to let you navigate APIs m
 
 Starts `hc` by providing a configuration file.
 
-Here's a simple configuration file:
+    hc example.yml
+
+Here's a sample configuration file:
 
     name: "omise"
 
