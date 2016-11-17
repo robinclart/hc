@@ -10,8 +10,13 @@ require "json"
 require "ansi"
 require "readline"
 
-config = YAML.load(File.read(ARGV.first)).to_h
-profile = Hc::Profile.new(config)
+if !ARGV.first || !File.exists?(ARGV.first)
+  puts "No hc profile configuration file given"
+  puts "Usage: hc example.yml"
+  exit 1
+end
+
+profile = Hc::Profile.open(ARGV.first)
 
 begin
   profile.start!

@@ -11,6 +11,10 @@ module Hc
       @response = nil
     end
 
+    def self.open(path)
+      new YAML.load(File.read(path)).to_h
+    end
+
     attr_reader :name
     attr_reader :env
 
