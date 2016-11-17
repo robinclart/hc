@@ -1,14 +1,6 @@
 #!/usr/bin/env ruby
 
-$:.unshift File.expand_path("../../lib", __FILE__)
-
 require "hc"
-require "rest-client"
-require "uri"
-require "shellwords"
-require "json"
-require "ansi"
-require "readline"
 
 if !ARGV.first || !File.exists?(ARGV.first)
   puts "No hc profile configuration file given"

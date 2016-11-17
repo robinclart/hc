@@ -1,4 +1,9 @@
+require "rest-client"
+require "uri"
+require "shellwords"
+require "json"
 require "yaml"
+require "readline"
 
 module Hc
   class Profile
