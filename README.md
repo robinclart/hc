@@ -44,6 +44,8 @@ Here's a sample configuration file:
         - 'post /charges amount=100000 currency=thb card=%{token_id}'
         - 'store charge_id id'
 
+Files can be loaded by placing configuration files into `~/.hc/NAME.yml` then loaded using `hc NAME` without the extension.
+
 # Options
 
 `name` defines the name shown in the prompt.
