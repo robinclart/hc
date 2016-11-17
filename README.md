@@ -70,7 +70,7 @@ you pass.
 
 `plays` list all plays.
 
-`play [PLAY_NAME]` run a play.
+`play PLAY_NAME` run a play.
 
 `store NAME ATTRIBUTE` store into NAME the value from the ATTRIBUTE found in the latest response.
 
