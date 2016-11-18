@@ -57,8 +57,12 @@ module Hc
     end
 
     def use(env)
-      @env     = env
-      @profile = @config["environments"][@env]
+      profile = @config["environments"][env]
+
+      if profile
+        @env     = env
+        @profile = profile
+      end
     end
 
     def get(args)
